@@ -1,0 +1,14 @@
+{
+  "name": "lianlema",
+  "version": "1.0.0",
+  "private": true,
+  "description": "练了吗 —— 今天练什么。零依赖的训练计划生成器 + 组间计时 + 记录。",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "license": "MIT"
+}

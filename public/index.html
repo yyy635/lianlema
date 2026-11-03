@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101210">
+<meta name="description" content="练了吗 —— 今天练什么。30 秒生成训练，组间自动计时，练完自动记账。">
+<title>练了吗</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23101210'/%3E%3Cpath d='M14 26v12M22 20v24M42 20v24M50 26v12M22 32h20' stroke='%23d7fb4a' stroke-width='5' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<div class="app">
+
+  <main id="main">
+
+    <!-- ============ 今日 ============ -->
+    <section class="view" id="view-today" data-view="today">
+      <div class="topline">
+        <span class="eyebrow" id="today-date">—</span>
+        <span class="streak" id="today-streak"><i></i><span>连续 0 天</span></span>
+      </div>
+
+      <h1 class="h1">今天练什么</h1>
+      <p class="lead" id="today-lead">第一次来？随便选一个，先练起来。</p>
+
+      <div class="resume hidden" id="resume-card">
+        <div class="resume-text">
+          <b>还有一组没做完</b>
+          <span id="resume-sub">—</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="btn-resume">继续</button>
+      </div>
+
+      <div class="field">
+        <div class="field-head"><span class="label">练哪里</span><span class="hint">单选</span></div>
+        <div class="chips" id="chips-focus"></div>
+      </div>
+
+      <div class="field">
+        <div class="field-head"><span class="label">练多久</span><span class="hint">含热身</span></div>
+        <div class="chips" id="chips-time"></div>
+      </div>
+
+      <div class="field">
+        <div class="field-head"><span class="label">手边有什么</span><span class="hint">可多选</span></div>
+        <div class="chips" id="chips-gear"></div>
+      </div>
+
+      <button class="btn btn-primary" id="btn-generate">生成今日训练</button>
+
+      <div class="stats" id="today-stats"></div>
+
+      <p class="disclaim">重量、容量均为估算，只用来跟你自己比。</p>
+    </section>
+
+    <!-- ============ 今日训练（计划） ============ -->
+    <section class="view" id="view-plan" data-view="plan" hidden>
+      <div class="navbar">
+        <button class="icon-btn" data-go="today" aria-label="返回">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M14.5 5.5 8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <span class="navbar-title">今日训练</span>
+        <button class="link" id="btn-shuffle">换一套</button>
+      </div>
+
+      <p class="eyebrow" id="plan-focus">—</p>
+      <h1 class="h1" id="plan-title">—</h1>
+      <div class="tags" id="plan-tags"></div>
+
+      <div class="list" id="plan-list"></div>
+
+      <div class="dock">
+        <div class="dock-meta"><span>预计</span><b id="dock-time">0</b><span>分钟</span></div>
+        <button class="btn btn-primary" id="btn-start">开始训练</button>
+      </div>
+    </section>
+
+    <!-- ============ 训练中 ============ -->
+    <section class="view" id="view-workout" data-view="workout" hidden>
+      <div class="wk-top">
+        <button class="icon-btn" id="btn-quit" aria-label="结束">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+        </button>
+        <div class="segments" id="wk-seg"></div>
+        <span class="count num" id="wk-count">1 / 1</span>
+      </div>
+
+      <p class="kicker" id="wk-kicker">第 1 个动作</p>
+      <h1 class="wk-name" id="wk-name">—</h1>
+      <div class="tags" id="wk-tags"></div>
+
+      <div class="pips" id="wk-pips"></div>
+
+      <div class="inputs">
+        <div class="input-box">
+          <span class="lbl" id="wk-wlabel">重量 KG</span>
+          <div class="stepper">
+            <button data-step="w" data-dir="-1" aria-label="减">−</button>
+            <input class="num" id="wk-w" type="number" inputmode="decimal" step="2.5" min="0" value="0">
+            <button data-step="w" data-dir="1" aria-label="加">+</button>
+          </div>
+        </div>
+        <div class="input-box">
+          <span class="lbl" id="wk-rlabel">次数</span>
+          <div class="stepper">
+            <button data-step="r" data-dir="-1" aria-label="减">−</button>
+            <input class="num" id="wk-r" type="number" inputmode="numeric" step="1" min="1" value="10">
+            <button data-step="r" data-dir="1" aria-label="加">+</button>
+          </div>
+        </div>
+      </div>
+
+      <p class="last" id="wk-last">—</p>
+
+      <div class="tip"><span>要领</span><p id="wk-tip">—</p></div>
+
+      <button class="btn btn-primary wk-cta" id="btn-set">完成这组</button>
+    </section>
+
+    <!-- ============ 完成 ============ -->
+    <section class="view" id="view-done" data-view="done" hidden>
+      <div class="done-check">
+        <svg viewBox="0 0 24 24" width="30" height="30"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h1 class="h1">练完了</h1>
+      <p class="lead" id="done-sub">—</p>
+
+      <div class="grid" id="done-grid"></div>
+
+      <p class="label">今日部位</p>
+      <div class="bars" id="done-bars"></div>
+
+      <div class="done-actions">
+        <button class="btn btn-primary" data-go="today">回到今天</button>
+        <button class="btn btn-ghost" id="btn-share">复制训练卡</button>
+      </div>
+    </section>
+
+    <!-- ============ 记录 ============ -->
+    <section class="view" id="view-records" data-view="records" hidden>
+      <p class="eyebrow">记录</p>
+      <h1 class="h1">这周</h1>
+
+      <div class="week" id="rec-week"></div>
+      <div class="stats" id="rec-stats"></div>
+
+      <p class="label">最近 7 天，练了哪些部位</p>
+      <div class="bars" id="rec-bars"></div>
+
+      <p class="label">最近</p>
+      <div class="list" id="rec-list"></div>
+    </section>
+
+    <!-- ============ 我的 ============ -->
+    <section class="view" id="view-me" data-view="me" hidden>
+      <p class="eyebrow">我的</p>
+
+      <div class="profile">
+        <div class="avatar" id="me-avatar">—</div>
+        <div class="profile-text">
+          <div class="name" id="me-name">—</div>
+          <div class="sub" id="me-sub">—</div>
+        </div>
+      </div>
+
+      <div class="card weight-card">
+        <div class="weight-head">
+          <span class="label">体重</span>
+          <button class="link" id="btn-weigh">记一笔</button>
+        </div>
+        <div class="weight-num"><b class="num" id="me-weight">—</b><span>kg</span></div>
+        <p class="delta" id="me-delta">还没有记录</p>
+        <div class="spark" id="me-spark"></div>
+      </div>
+
+      <div class="list" id="me-rows"></div>
+
+      <div class="data-actions">
+        <button class="btn btn-ghost btn-sm" id="btn-export">导出数据</button>
+        <button class="btn btn-ghost btn-sm" id="btn-import">导入数据</button>
+        <button class="btn btn-ghost btn-sm danger" id="btn-reset">清空</button>
+        <input type="file" id="file-import" accept="application/json" hidden>
+      </div>
+
+      <p class="disclaim">数据只存在这台设备的浏览器里，不上传任何服务器。换设备用「导出 / 导入」搬。</p>
+    </section>
+
+  </main>
+
+  <!-- ============ 标签栏 ============ -->
+  <nav class="tabbar" id="tabbar">
+    <button data-go="today" data-tab="today">
+      <svg viewBox="0 0 24 24" width="23" height="23"><path d="M4 9v6M7.5 6.5v11M16.5 6.5v11M20 9v6M7.5 12h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>今日</span>
+    </button>
+    <button data-go="records" data-tab="records">
+      <svg viewBox="0 0 24 24" width="23" height="23"><path d="M5 19v-7M12 19V5M19 19v-9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>记录</span>
+    </button>
+    <button data-go="me" data-tab="me">
+      <svg viewBox="0 0 24 24" width="23" height="23"><circle cx="12" cy="8.5" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 19.5a7.2 7.2 0 0 1 14 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>我的</span>
+    </button>
+  </nav>
+
+  <!-- ============ 组间休息 ============ -->
+  <div class="rest" id="rest" hidden>
+    <p class="rest-label">休息</p>
+    <div class="ring">
+      <svg viewBox="0 0 232 232" aria-hidden="true">
+        <circle cx="116" cy="116" r="106" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="10"/>
+        <circle id="ring-fg" cx="116" cy="116" r="106" fill="none" stroke="var(--lime)" stroke-width="10"
+                stroke-linecap="round" transform="rotate(-90 116 116)"
+                stroke-dasharray="666" stroke-dashoffset="0"/>
+      </svg>
+      <div class="ring-center">
+        <span class="num" id="rest-time">90</span>
+        <small>秒</small>
+      </div>
+    </div>
+    <p class="rest-next" id="rest-next">下一个</p>
+    <div class="rest-actions">
+      <button class="btn btn-ghost" id="btn-skip">跳过</button>
+      <button class="btn btn-ghost" id="btn-add30">+30 秒</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<!-- 数字输入弹层 -->
+<dialog class="ask" id="ask">
+  <form method="dialog">
+    <p class="ask-title" id="ask-title">标题</p>
+    <div class="ask-row">
+      <input class="num" id="ask-input" type="number" inputmode="decimal" step="0.1">
+      <span id="ask-unit">kg</span>
+    </div>
+    <div class="ask-actions">
+      <button type="button" class="btn btn-ghost" id="ask-cancel">取消</button>
+      <button value="ok" class="btn btn-primary">确定</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="./app.js"></script>
+</body>
+</html>
