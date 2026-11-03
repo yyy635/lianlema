@@ -361,7 +361,11 @@
       $('#today-lead').textContent = '第一次来？随便选一个，先练起来。';
     } else {
       const next = FOCUS[last.focus] ? FOCUS[last.focus].next : 'push';
-      $('#today-lead').textContent = `上次练${FOCUS[last.focus] ? FOCUS[last.focus].label : '训练'}，${relDay(last.date)}。今天轮到${FOCUS[next].label}。`;
+      const label = FOCUS[last.focus] ? FOCUS[last.focus].label : '训练';
+      const when = relDay(last.date);
+      $('#today-lead').textContent = when === '今天'
+        ? `今天已经练过${label}。再补一组${FOCUS[next].label}也行。`
+        : `上次练${label}，${when}。今天轮到${FOCUS[next].label}。`;
     }
 
     // 续练
